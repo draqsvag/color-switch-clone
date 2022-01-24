@@ -23,8 +23,7 @@ public class Player : MonoBehaviour
         playerRigid = GetComponent<Rigidbody2D>();
         playerRenderer = GetComponent<SpriteRenderer>();
 
-        currentColor = ColorManager.Instance.GetRandomColor();
-        playerRenderer.color = currentColor;
+        UpdateColor();
 
         playerRigid.velocity = Vector2.up * jumpForce * 1.5f;
     }
@@ -42,8 +41,7 @@ public class Player : MonoBehaviour
     {
         if (collision.CompareTag("ColorChanger"))
         {
-            currentColor = ColorManager.Instance.GetRandomColor();
-            playerRenderer.color = currentColor;
+            UpdateColor();
             Destroy(collision.gameObject);
         }
 
@@ -53,5 +51,13 @@ public class Player : MonoBehaviour
 
             Destroy(gameObject);
         }
+    }
+
+    private void UpdateColor()
+    {
+        currentColor = ColorManager.Instance.GetRandomColor();
+        playerRenderer.color = currentColor;
+        transform.GetChild(0).GetComponent<TrailRenderer>().startColor = currentColor;
+        transform.GetChild(0).GetComponent<TrailRenderer>().endColor = new Color32(240, 240, 240, 255);
     }
 }

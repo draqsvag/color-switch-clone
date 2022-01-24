@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour
     public void PlayDieEffects()
     {
         //Set Particle
-        deadParticle.transform.position = transform.position;
+        deadParticle.transform.position = Player.Instance.transform.position;
         ParticleSystem.MainModule deadMain = deadParticle.main;
         ParticleSystem.MinMaxGradient deadColor = deadMain.startColor;
         deadColor.mode = ParticleSystemGradientMode.Color;
