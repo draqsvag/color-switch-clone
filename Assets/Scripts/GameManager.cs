@@ -27,15 +27,21 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void SetParticleColor(ParticleSystem particleSystem, Color32 color)
+    {
+        ParticleSystem.MainModule deadMain = particleSystem.main;
+        ParticleSystem.MinMaxGradient deadColor = deadMain.startColor;
+
+        deadColor.mode = ParticleSystemGradientMode.Color;
+        deadColor.color = color;
+        deadMain.startColor = deadColor;
+    }
+
     public void PlayDieEffects()
     {
         //Set Particle
         deadParticle.transform.position = Player.Instance.transform.position;
-        ParticleSystem.MainModule deadMain = deadParticle.main;
-        ParticleSystem.MinMaxGradient deadColor = deadMain.startColor;
-        deadColor.mode = ParticleSystemGradientMode.Color;
-        deadColor.color = Player.Instance.currentColor;
-        deadMain.startColor = deadColor;
+        SetParticleColor(deadParticle, Player.Instance.currentColor);
         deadParticle.Play();
 
         restartText.SetActive(true);

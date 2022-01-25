@@ -9,7 +9,9 @@ public class Player : MonoBehaviour
     public float jumpForce = 10f;
     private Rigidbody2D playerRigid;
     private SpriteRenderer playerRenderer;
+    private Animator playerAnimator;
     public Color32 currentColor;
+    public ObjectPool particlePool;
 
     public UnityEvent OnPlayerDead;
 
@@ -22,6 +24,7 @@ public class Player : MonoBehaviour
     {
         playerRigid = GetComponent<Rigidbody2D>();
         playerRenderer = GetComponent<SpriteRenderer>();
+        playerAnimator = GetComponent<Animator>();
 
         UpdateColor();
 
@@ -34,6 +37,10 @@ public class Player : MonoBehaviour
         if (Input.GetButtonDown("Jump") || Input.GetMouseButtonDown(0))
         {
             playerRigid.velocity = Vector2.up * jumpForce;
+            ScreenShake.Instance.Shake(0.25f, 1f);
+            GameObject lastParticle = particlePool.GetObjectFromPool(transform.position, Quaternion.identity);
+            GameManager.Instance.SetParticleColor(lastParticle.GetComponent<ParticleSystem>(), currentColor);
+            particlePool.AddObjectToPoolInSeconds(lastParticle, 1);
         }
     }
 
@@ -42,15 +49,26 @@ public class Player : MonoBehaviour
         if (collision.CompareTag("ColorChanger"))
         {
             UpdateColor();
+            playerAnimator.Play("PlayerPop");
             Destroy(collision.gameObject);
         }
 
-        else if ((Color32) collision.GetComponent<SpriteRenderer>().color != (Color) currentColor)
+        else if((Color32) collision.GetComponent<SpriteRenderer>().color != (Color) currentColor)
         {
-            OnPlayerDead.Invoke();
-
-            Destroy(gameObject);
+            PlayerDie();
         }
+
+        else if (collision.CompareTag("DeadZone"))
+        {
+            PlayerDie();
+        }
+    }
+
+    public void PlayerDie()
+    {
+        OnPlayerDead.Invoke();
+        ScreenShake.Instance.Shake(0.35f, 4f);
+        Destroy(gameObject);
     }
 
     private void UpdateColor()
